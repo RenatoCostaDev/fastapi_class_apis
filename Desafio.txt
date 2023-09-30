@@ -1,0 +1,16 @@
+Desafio final!!
+Você está concorrendo a uma vaga e o desafio final é refatorar esta api.
+Cada item implementado abaixo vale 1 ponto,
+menos o bootstrap e o sqlachemy, que valem dois,
+boa sorte!!
+
+Itens a serem avaliados:
+
+1-  organização do código;
+2- estrutura do código;
+3- documentação;
+4- design do código(bootstrap);
+https://getbootstrap.com/docs/5.3/getting-started/introduction/
+5-  itens e criatividade;
+6-  fator uoooollll!!!
+7-sqlachemy;

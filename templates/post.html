@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+<form action = '/post-client' method = "post"> 
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type = "text" name = "nombre" placeholder = "Nombre"/>
+    </div> 
+    <div class="mb-3">
+        <label>Plato Favorito</label>
+        <input type = "text" name = "plato_favorito" placeholder = "Plato Favorito"/>
+    </div> 
+ 
+    <input type = "submit" value = "Submit"/>  
+ </form> 
+  
+{% endblock content %}

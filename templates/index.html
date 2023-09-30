@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div>
+    <div>
+        <a href='/form' >Add New</a>
+        <br><br>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Plato Favorito</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in taco_clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>{{ client.nombre }}</td>
+                        <td>{{ client.plato_favorito }}</td>
+                        <td>
+                            <a href='/edit-client/{{ client.id }}'>Edit</a> | <a href='/delete-client/{{ client.id }}'>Delete</a>  
+                        </td>
+                    </tr>
+                {% endfor %}    
+            </tbody>
+        </table>
+    </div>
+</div>
+ 
+{% endblock content %}

@@ -1,56 +1,86 @@
-from fastapi import FastAPI
-import models
-from database import engine
-
-#  2nd part
-from typing import Annotated
-from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
-from database import get_db
-
-
-# 3rd part
-from models import Books, BookRequest
+from fastapi import FastAPI, Request, Form, status
+from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=engine)
+templates = Jinja2Templates(directory='templates')
 
-db_dependency = Annotated[Session, Depends(get_db)]
 
-@app.get('/')
-async def read_all(db: db_dependency):
-    return db.query(Books).all()
 
-@app.get('/book/{id}')
-async def read_book(db: db_dependency, id: int):
-    book_model = db.query(Books).filter(Books.id == id).first()
-    if book_model is not None:
-        return book_model
-    raise HTTPException(status_code=404, detail='Book not found')
+taco_clients = [
+    {
+        'id': 1,
+        'nombre': 'Jóse',
+        'plato_favorito': 'Cuacamole',
+    },
+    {
+        'id': 2,
+        'nombre': 'Valetina',
+        'plato_favorito': 'Chilli com carne',
+    },
+]
 
-@app.post('/book')
-async def create_book(db: db_dependency, book_request: BookRequest):
-    book_model = Books(**book_request.model_dump())
-    db.add(book_model)
-    db.commit()
+@app.get('/taco-clients', response_class=HTMLResponse)
+async def get_clients(request: Request):
+    return templates.TemplateResponse(
+        "index.html", 
+        {"request": request,"taco_clients": taco_clients}
+    )
+ 
+#  Post urls
+@app.get('/form', response_class=HTMLResponse)
+async def get_form(request: Request):
+    return templates.TemplateResponse(
+        "post.html", 
+        {"request": request}
+    )
 
-@app.put('/book/{id}')
-async def update_book(db: db_dependency, book_request: BookRequest, id: int):
-    book_model = db.query(Books).filter(Books.id == id).first()
-    if book_model is None:
-        raise HTTPException(status_code=404, detail='Book not found')
-    book_model.title = book_request.title
-    book_model.author = book_request.author
-    book_model.rating = book_request.rating
+# obs:pip install python-multipart 
+@app.post('/post-client')
+async def post_client(nombre: str = Form(...), plato_favorito: str = Form(...)):
+    taco_client_dict = {
+        'id': len(taco_clients) + 1,
+        'nombre': nombre,
+        'plato_favorito': plato_favorito,
+    } 
+    
+    taco_clients.append(taco_client_dict)
+    return RedirectResponse(url=app.url_path_for("get_clients"), status_code=status.HTTP_303_SEE_OTHER)
 
-    db.add(book_model)
-    db.commit()
+# update urls
+@app.get('/edit-client/{id}')
+async def get_by_id(id: int, request: Request):
+    id_int = int(id)
+    client = get_client_by_id(id_int)
+    return templates.TemplateResponse(
+        "edit.html", 
+        {"request": request, 'client': client}
+    )
 
-@app.delete('/book/{id}')
-async def delete_book(db: db_dependency,id: int):
-    book_model = db.query(Books).filter(Books.id == id).first()
-    if book_model is None:
-        raise HTTPException(status_code=404, detail='Book not found')    
-    db.query(Books).filter(Books.id == id).delete()
-    db.commit()
+def get_client_by_id(id):
+    client_id = {}
+    for client in taco_clients:
+       if client['id'] == id:
+            client_id = client
+    return client_id
+    
+@app.post('/update-client/{id}')
+async def update_client(id: int, nombre: str = Form(...), plato_favorito: str = Form(...)):
+    id_int = int(id)
+    for client in taco_clients:
+        if client['id'] == id_int:
+            client['nombre'] = nombre
+            client['plato_favorito'] = plato_favorito
+
+    return RedirectResponse(url=app.url_path_for("get_clients"), status_code=status.HTTP_303_SEE_OTHER)
+
+#  delete url
+@app.get('/delete-client/{id}')
+async def delete_client(id: int):
+    id_int = int(id)
+    for client in taco_clients:
+        if client['id'] == id_int:
+            taco_clients.remove(client)
+
+    return RedirectResponse(url=app.url_path_for("get_clients"), status_code=status.HTTP_303_SEE_OTHER)
