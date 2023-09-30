@@ -1,21 +1,26 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean
-
-# 3rd part
+from sqlalchemy import Column, Float, Integer, String
 from pydantic import BaseModel
 
-class Todos(Base):
-    __tablename__ = 'todos'
+
+class Books(Base):
+    __tablename__ = 'books'
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    description = Column(String)
-    priority = Column(Integer)
-    complete = Column(Boolean, default=False)
+    author = Column(String)
+    rating = Column(Float)
 
-# 3rd part
-class TodoRequest(BaseModel):
+class BookRequest (BaseModel):
     title: str
-    description: str
-    priority: int
-    complete: bool
+    author: str
+    rating: float
+
+    class Config:
+        json_schema_extra = {   # schema_extra
+            'example': {
+                "title": "fastApi",
+                "author": "Renato Costa",
+                "rating": 10
+            }
+        }
