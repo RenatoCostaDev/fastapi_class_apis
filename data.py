@@ -1,10 +1,12 @@
-lista_alunos = [
-    {
-        'id': 1,
-        'nome': 'Renato'
+cursos = {
+    1: {
+        'titulo': 'Programação para leigos',
+        'aulas': 112,
+        'horas': 58,
     },
-    {
-        'id': 2,
-        'nome': 'Luciana'
+    2: {
+        'titulo': 'Algoritmos e lógica de programação',
+        'aulas': 87,
+        'horas': 67,
     },
-]
+}

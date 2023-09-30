@@ -1,45 +1,76 @@
-from fastapi import FastAPI
-from data import lista_alunos
+from fastapi import FastAPI, Depends, HTTPException, status
+from typing import Any
 
-from data import lista_alunos # list/dict
-from apiTools import * # funções usadas na api
+from apiTools import fake_db # simular chamada demorada ao db,Ex: uso do async
+from data import cursos
 
 app = FastAPI()
 
-@app.get('/get-alunos')
-async def get():
-    return lista_alunos
+@app.get('/cursos', status_code=status.HTTP_200_OK)
+async def get(db: Any = Depends(fake_db)):
+    try:
+        return cursos
+    except:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Cursos não encontrados'
+    )
 
-@app.get('/get-aluno/{id}')
-async def get_by_id(id: int):
-    id_int = int(id) - 1
-    return lista_alunos[id_int]
+@app.get('/cursos/{id}', status_code=status.HTTP_200_OK)
+async def get_curso_by_id(id: int):
+    # return cursos[id]
+    try:
+        return cursos[id]
+    except:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Curso não encontrado'
+    )
 
-@app.post('/post-aluno')
-async def post(nome: str):
-    new_id = len(lista_alunos) + 1
-    lista_alunos.append({
-        'id': new_id,
-        'nome': nome
-    })
-    return lista_alunos
+@app.post('/curso-post', status_code=status.HTTP_201_CREATED)
+async def post_curso(titulo: str, aulas: int, horas: int):
+      try:
+        next_id: int = len(cursos) + 1
+        cursos[next_id] = {
+            'titulo': titulo,
+            'aulas': aulas,
+            'horas': horas,
+            }
+        return cursos
+      except:
+          raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail='Curso não encontrado'
+    )          
 
-@app.put('/update-aluno/{id}')
-async def update(id: int, nome:str):
-    id_int = int(id) -1
-    aluno_update = lista_alunos[id_int]
-    aluno_update['nome'] = nome
-    return lista_alunos
+@app.put('/curso-update/{id}', status_code=status.HTTP_202_ACCEPTED)
+async def update_curso(titulo: str, aulas: str, horas: str, id: int):
+    try:
+        if id in cursos:
+            cursos[id] = {
+                'titulo': titulo,
+                'aulas': aulas,
+                'horas': horas,
+                }
+            return cursos
+    except:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Curso não encontrado com o id:{id}'
+    )
+    
+@app.delete('/curso-delete/{id}', status_code=status.HTTP_200_OK)
+async def delete_curso(id: int):
+    try:
+        del cursos[id]
 
-@app.delete('/delete-aluno/{id}')
-async def delete(id: int):
-    id_int = int(id)
-    # -1 pois o indice da lista começa no 0
-    lista_alunos.pop(id_int-1) 
-
-    news_ids = 0
-    for aluno in lista_alunos:
-        news_ids += 1
-        aluno['id'] = news_ids
-
-    return lista_alunos
+        # Desafio!!
+        # atualizar indices/keys do objeto/dict cursos
+        
+        return cursos
+    except:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f'Curso não encontrado com o id:{id}'
+    )
+    
