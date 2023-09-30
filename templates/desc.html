@@ -1,0 +1,23 @@
+{% extends 'base.html'%}
+{% block conteudo%}
+<table  class="table table-success table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Estado</th>
+      <th scope="col">Suspeita</th>
+      <th scope="col">Mortes</th>
+      <th scope="col">Última atualização</th>
+    </tr>
+  </thead>
+  {% for dado in organized_desc %}
+    <tbody>
+      <tr>
+        <th scope="row">{{dado.uf}}</th>
+        <td>{{dado.suspects}}</td>
+        <td>{{dado.deaths}}</td>
+        <td>{{dado.datetime}}</td>
+      </tr>
+    </tbody>
+  {%endfor%}
+</table>
+{% endblock conteudo%}
